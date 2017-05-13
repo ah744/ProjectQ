@@ -11,7 +11,7 @@
 #   limitations under the License.
 
 """
-Tests for projectq.backends._resource.py.
+Tests for projectq.backends._rotations.py.
 """
 
 import pytest

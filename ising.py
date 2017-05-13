@@ -2,17 +2,22 @@ import math
 import numpy as np
 
 from projectq import MainEngine
+import projectq.setups.ibm
 from projectq.backends import CircuitDrawer
-from projectq.ops import H, Z, X, Measure, All, R, CNOT, Rz
+from projectq.backends import CommandPrinter 
+from projectq.backends import IBMBackend 
+from projectq.cengines import IBMCNOTMapper
+from projectq.backends import RotationDecomposition 
+from projectq.ops import H, Z, X, Measure, All, R, CNOT, Rz, T, S
 from projectq.meta import Loop, Compute, Uncompute, Control
 
 def CZ(q1, q2, phi):
 #    Rz( 1 ) | q2
     Rz( -2*phi ) | q2
-    CNOT | (q1, q2)
+#    CNOT | (q1, q2)
 #    Rz( 1 ) | q2
     Rz( phi ) | q2
-    CNOT | (q1, q2)
+#    CNOT | (q1, q2)
 
 def ZcrossZ(q1, q2, phi):
 #    Rz(1) | q1
@@ -60,11 +65,10 @@ def run_ising(eng, N, Bx, Bz, J, M, T):
 
     # start in uniform superposition
     All(H) | x
-
-#    for m in range(M):
-#        Red(x, m, J, M)
-#        Black(x, m, J, M)
-#        Inter(x, m, Bx, Bz, T, M)
+    for m in range(M):
+        Red(x, m, J, M)
+        Black(x, m, J, M)
+        Inter(x, m, Bx, Bz, T, M)
 
     Measure | x 
     eng.flush()
@@ -74,10 +78,13 @@ def run_ising(eng, N, Bx, Bz, J, M, T):
 
 if __name__ == "__main__":
     drawing_engine = CircuitDrawer()
-    eng = MainEngine()  # use default compiler engine
+    command_printer = CommandPrinter()
+    rotation_decomposition = RotationDecomposition()
+    ibm = IBMBackend(use_hardware=True, num_runs=1024,verbose=True)
+    eng = MainEngine(ibm, [rotation_decomposition, IBMCNOTMapper() ])  # use default compiler engine
 
     Bx = 2
-    M = 25
+    M = 25 
     T = 15
     N = 5 
     Bz = np.random.uniform(-Bx,Bx,N)

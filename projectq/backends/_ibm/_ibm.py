@@ -200,6 +200,11 @@ class IBMBackend(BasicEngine):
                 + self.qasm)
         info = {}
         info['qasm'] = qasm
+        with open("file.qasm", "w") as f:
+            for key in info:
+                f.write(key)
+                for val in info[key]:
+                    f.write(val)
         info['codeType'] = "QASM2"
         info['name'] = "ProjectQ Experiment"
         info = json.dumps(info)
