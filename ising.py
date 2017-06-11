@@ -12,16 +12,12 @@ from projectq.ops import H, Z, X, Measure, All, R, CNOT, Rz, T, S
 from projectq.meta import Loop, Compute, Uncompute, Control
 
 def CZ(q1, q2, phi):
-#    Rz( 1 ) | q2
     Rz( -2*phi ) | q2
-#    CNOT | (q1, q2)
-#    Rz( 1 ) | q2
+    CNOT | (q1, q2)
     Rz( phi ) | q2
-#    CNOT | (q1, q2)
+    CNOT | (q1, q2)
 
 def ZcrossZ(q1, q2, phi):
-#    Rz(1) | q1
-#    Rz(1) | q2
     Rz(phi) | q1
     Rz(-1*phi) | q2
     CZ(q1,q2,-2*phi)
@@ -29,13 +25,11 @@ def ZcrossZ(q1, q2, phi):
 def Red(qubits, m, J, M):
     for n in range(0,len(qubits)-1,2):
         phi = J[n] * (2.0*m - 1)/M
-#        phi = 1
         ZcrossZ(qubits[n], qubits[n+1], phi)
 
 def Black(qubits, m, J, M):
     for n in range(1,len(qubits)-1,2):
         phi = J[n] * (2.0*m - 1)/M
-#        phi = 1
         ZcrossZ(qubits[n], qubits[n+1], phi)
 
 def Inter(qubits, m, Bx, Bz, T, M):
@@ -44,14 +38,12 @@ def Inter(qubits, m, Bx, Bz, T, M):
         theta2 = (1.0 - (2.0*m-1)/M)* -2 * Bz[n] * T / M
         H | qubits[n]
         Rz(theta1) | qubits[n]
-#        Rz(1) | qubits[n]
         H | qubits[n]
-#        Rz(1) | qubits[n]
         Rz(theta2) | qubits[n]
 
 def run_ising(eng, N, Bx, Bz, J, M, T):
     """
-    Runs Ising Model Hamiltonian simulation on n = 10 qubits 
+    Runs Ising Model Hamiltonian simulation on n = N qubits 
     Args:
         eng (MainEngine): Main compiler engine to run Ising on.
         N (int): Number of bits in the problem.
@@ -81,7 +73,7 @@ if __name__ == "__main__":
     command_printer = CommandPrinter()
     rotation_decomposition = RotationDecomposition()
     ibm = IBMBackend(use_hardware=True, num_runs=1024,verbose=True)
-    eng = MainEngine(ibm, [rotation_decomposition, IBMCNOTMapper() ])  # use default compiler engine
+    eng = MainEngine(drawing_engine, [rotation_decomposition])  # use rotation decomposition first
 
     Bx = 2
     M = 25 
@@ -92,4 +84,4 @@ if __name__ == "__main__":
 
     # run Ising Model with n = N qubits 
     print(run_ising(eng, N, Bx, Bz, J, M, T))
-#    print(drawing_engine.get_latex())
+    print(drawing_engine.get_latex())
